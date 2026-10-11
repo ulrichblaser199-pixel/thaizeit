@@ -1,0 +1,35 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//ThaiZeit//Kulturkalender//DE
+X-WR-CALNAME:Thailaendische Feiertage (Beispiel)
+BEGIN:VEVENT
+SUMMARY:วันนวมินทรมหาราช (Wan Nawamintharamaharat)
+DTSTART;VALUE=DATE:20261013
+DTEND;VALUE=DATE:20261014
+DESCRIPTION:Gedenktag an König Bhumibol Adulyadej (Rama IX.)
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:วันปิยมหาราช (Chulalongkorn-Tag)
+DTSTART;VALUE=DATE:20261023
+DTEND;VALUE=DATE:20261024
+DESCRIPTION:Gedenktag an König Chulalongkorn (Rama V.)
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:วันลอยกระทง (Loy Krathong)
+DTSTART;VALUE=DATE:20261124
+DTEND;VALUE=DATE:20261125
+DESCRIPTION:Traditionelles thailändisches Lichterfest
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:วันพ่อแห่งชาติ (Nationalfeiertag & Vatertag)
+DTSTART;VALUE=DATE:20261205
+DTEND;VALUE=DATE:20261206
+DESCRIPTION:Geburtstag von König Bhumibol Adulyadej (Rama IX.)
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:วันสงกรานต์ (Songkran)
+DTSTART;VALUE=DATE:20270413
+DTEND;VALUE=DATE:20270416
+DESCRIPTION:Traditionelles thailändisches Neujahrsfest
+END:VEVENT
+END:VCALENDAR
