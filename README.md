@@ -1,2 +1,3 @@
 # thaizeit
-Tkinter Desktop-Uhr mit thailändischer Zeitrechnung, Lautschrift und Feiertagserklärungen.
+
+Erste Version: Thaizeit mit Feiertagslexikon und README
