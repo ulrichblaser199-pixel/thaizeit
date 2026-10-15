@@ -5,7 +5,7 @@ Desktop-Uhr & Kulturkalender zur synchronen Anzeige von aktuellem Datum,
 Uhrzeit und iCal-Terminen in thailändischer Schrift, Lautschrift und Deutsch.
 """
 
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 __author__ = "Ulrich Blaser"
 
 import os
@@ -63,7 +63,6 @@ latin_zahlen = {
     11: "sip et", 12: "sip song"
 }
 
-# Kultur-Lexikon thailändischer Feiertage mit kompakter Bedeutung (3-4 Sätze)
 FEIERTAGE_BEDEUTUNG = [
     {
         "keywords": ["นวมินทร", "nawamin", "navamin", "king bhumibol memorial", "passing of king rama 9", "13 october", "13 oktober", "13. oktober"],
@@ -218,7 +217,7 @@ def hour_thai(stunde):
         return "เที่ยงคืน"
     elif 1 <= stunde <= 5:
         return f"ตี {thai_zahlen[stunde]}"
-    elif stunde == 6:
+    elif 6 == stunde:
         return "หกโมงเช้า"
     elif 7 <= stunde <= 10:
         return f"{thai_zahlen[stunde]} โมงเช้า"
@@ -268,7 +267,6 @@ def aktuelles_datum_zeit():
     wochentag_thai, wochentag_latin, wochentag_de = wochentage[jetzt.weekday()]
     monat_thai, monat_latin, monat_de = monate[jetzt.month]
 
-    # Thai-Formatierung
     tag_thai = arabisch_zu_thai_ziffern(jetzt.day)
     jahr_thai = arabisch_zu_thai_ziffern(buddhist_jahr)
     stunde_thai = hour_thai(jetzt.hour)
@@ -281,14 +279,12 @@ def aktuelles_datum_zeit():
         "time": f"{stunde_thai} {min_thai_text} นาที {sek_thai} วินาที"
     }
 
-    # Phonetik / Lautschrift
     thai_latin = {
         "weekday": wochentag_latin,
         "date": f"{jetzt.day}. {monat_latin} {buddhist_jahr} (B.E.)",
         "time": f"{hour_latin(jetzt.hour)} {zahl_zu_latin(jetzt.minute)} nathi, {zahl_zu_latin(jetzt.second)} wina-thii"
     }
 
-    # Deutsche Referenz
     de_daten = {
         "weekday": wochentag_de,
         "date": jetzt.strftime("%d.%m.%Y"),
@@ -358,11 +354,9 @@ def termine_naechste(kalenders, anzahl=1):
                     is_ganztaegig = isinstance(val, datetime.date) and not isinstance(val, datetime.datetime)
                     start_dt = to_local_naive_datetime(val)
 
-                    # Optionales Enddatum prüfen (damit laufende Termine nicht vorzeitig verschwinden)
                     dtend = komponent.get('dtend')
                     end_dt = to_local_naive_datetime(dtend.dt) if dtend else start_dt
 
-                    # Prüfen auf jährliche Wiederholungsregel (RRULE:FREQ=YEARLY)
                     rrule = komponent.get('rrule')
                     ist_jaehrlich = False
                     if rrule and 'FREQ' in rrule:
