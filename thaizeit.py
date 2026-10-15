@@ -5,10 +5,12 @@ Desktop-Uhr & Kulturkalender zur synchronen Anzeige von aktuellem Datum,
 Uhrzeit und iCal-Terminen in thailändischer Schrift, Lautschrift und Deutsch.
 """
 
+__version__ = "0.5.1"
+__author__ = "Ulrich Blaser"
+
 import os
 import datetime
 import tkinter as tk
-from tkinter import ttk
 
 # Optionaler Import von icalendar mit Fallback-Schutz
 try:
@@ -64,7 +66,7 @@ latin_zahlen = {
 # Kultur-Lexikon thailändischer Feiertage mit kompakter Bedeutung (3-4 Sätze)
 FEIERTAGE_BEDEUTUNG = [
     {
-        "keywords": ["นวมินทร", "nawamin", "navamin", "king bhumibol memorial", "passing of king rama 9", "13 october", "13 oktober"],
+        "keywords": ["นวมินทร", "nawamin", "navamin", "king bhumibol memorial", "passing of king rama 9", "13 october", "13 oktober", "13. oktober"],
         "name": "Wan Nawamintharamaharat (วันนวมินทรมหาราช • 13. Oktober)",
         "info": "Dieser Gedenktag erinnert an den Todestag von König Bhumibol Adulyadej (Rama IX.), der Thailand über 70 Jahre lang mit außerordentlicher Hingabe regierte. Im Jahr 2023 verlieh das thailändische Königshaus diesem Feiertag offiziell den Ehrennamen 'Wan Nawamintharamaharat' zum ewigen Andenken an seine Verdienste. Thais tragen an diesem Tag häufig Gelb, halten landesweit Gedenkminuten ab und besuchen Tempel für Verdienstzeremonien (Tham Bun) zu Ehren des unvergessenen Monarchen."
     },
@@ -104,46 +106,47 @@ FEIERTAGE_BEDEUTUNG = [
         "info": "Mit Ok Phansa endet die dreimonatige Regenzeit-Klosterklausur der Mönche. Im ganzen Land feiern die Menschen diesen Tag mit farbenfrohen Prozessionen und der traditionellen Kathina-Zeremonie, bei der den Klöstern neue Mönchsroben dargebracht werden. In manchen Provinzen finden spektakuläre Drachenbootrennen und illuminierte Bootsparaden statt."
     },
     {
-        "keywords": ["chakri", "จักรี"],
+        "keywords": ["chakri", "จักรี", "6 april", "6. april"],
         "name": "Chakri-Gedenktag (วันจักรี • 6. April)",
         "info": "An diesem Nationalfeiertag wird der Gründung der herrschenden Chakri-Dynastie und Bangkoks als Hauptstadt im Jahr 1782 durch König Rama I. gedacht. Für Thais verkörpert das Königshaus ein wichtiges Symbol nationaler Einheit und Stabilität. Die Menschen legen Blumen an Monumenten nieder und gedenken der Verdienste aller bisherigen Monarchen für die Unabhängigkeit des Landes."
     },
     {
-        "keywords": ["coronation", "ฉัตรมงคล", "krönungstag"],
+        "keywords": ["coronation", "ฉัตรมงคล", "krönungstag", "4 mai", "4. mai"],
         "name": "Krönungstag (วันฉัตรมงคล • 4. Mai)",
         "info": "An diesem Feiertag gedenkt das Land der offiziellen Krönungszeremonie von König Maha Vajiralongkorn (Rama X.). Regierungsgebäude und Straßen werden landesweit festlich mit königlichen Symbolen, gelben Stoffen und Porträts geschmückt. Thais bekunden an diesem Tag ihren Respekt gegenüber der Monarchie und dem amtierenden Staatsoberhaupt."
     },
     {
-        "keywords": ["king rama x", "rama 10", "vajiralongkorn", "วชิราลงกรณ", "เฉลิมพระชนมพรรษา ร.10", "28 juli", "28 july"],
+        "keywords": ["king rama x", "rama 10", "vajiralongkorn", "วชิราลงกรณ", "เฉลิมพระชนมพรรษา ร.10", "28 juli", "28. juli", "28 july"],
         "name": "Geburtstag von König Rama X. (28. Juli)",
         "info": "Der Geburtstag des amtierenden Königs ist ein hoher Nationalfeiertag in Thailand. Das Volk ehrt den Monarchen durch das Tragen von Gelb (der Farbe des Montags, an dem der König geboren wurde) sowie durch religiöse Verdienstzeremonien. Landesweit organisieren Bürger und Behörden gemeinnützige Hilfsaktionen und Freiwilligenarbeit im Dienst der Allgemeinheit."
     },
     {
-        "keywords": ["queen sirikit", "muttertag", "mother's day", "วันแม่", "12 august", "12 august"],
+        "keywords": ["queen sirikit", "muttertag", "mother's day", "วันแม่", "12 august", "12. august"],
         "name": "Muttertag & Geburtstag der Königinmutter (12. August)",
         "info": "Zu Ehren von Königinmutter Sirikit wird ihr Geburtstag zugleich als nationaler Muttertag gefeiert. Kinder knien an diesem Tag traditionell vor ihren Müttern nieder und überreichen weiße Jasminblüten als Zeichen bedingungsloser und reiner Dankbarkeit. Im ganzen Land hängen hellblaue Flaggen (ihre Geburtsfarbe), und Tempel werden für familiäre Segnungen besucht."
     },
     {
-        "keywords": ["chulalongkorn", "ปิยมหาราช", "จุฬาลงกรณ์", "rama 5", "23 oktober", "23 october"],
+        "keywords": ["chulalongkorn", "ปิยมหาราช", "จุฬาลงกรณ์", "rama 5", "23 oktober", "23. oktober", "23 october"],
         "name": "Chulalongkorn-Tag (วันปิยมหาราช • 23. Oktober)",
         "info": "Dieser Gedenktag ehrt König Rama V. (Chulalongkorn), der als einer der größten Herrscher Thailands gilt. Ihm gelang es durch geschickte Diplomatie und Reformen, die Kolonisierung des Landes abzuwenden sowie die Sklaverei friedlich abzuschaffen. Thais bringen an seinen Standbildern rosafarbene Rosen dar, um ihre Dankbarkeit für die Modernisierung des Landes zu zeigen."
     },
     {
-        "keywords": ["bhumibol", "rama 9", "vatertag", "father's day", "วันพ่อ", "5 dezember", "5 december"],
+        "keywords": ["bhumibol", "rama 9", "vatertag", "father's day", "วันพ่อ", "5 dezember", "5. dezember", "5 december"],
         "name": "Nationalfeiertag & Geburtstag König Bhumibol (5. Dezember)",
         "info": "Der 5. Dezember war der Geburtstag des 2016 verstorbenen, tief verehrten Königs Bhumibol Adulyadej und ist Thailands Nationalfeiertag sowie Vatertag. Kinder ehren ihre Väter mit gelben Canna-Blumen, während das Land die über 4.000 königlichen Entwicklungsprojekte des Monarchen würdigt. Gelbe Kleidung drückt bis heute die tiefe Dankbarkeit und Verbundenheit vieler Thais mit ihm aus."
     },
     {
-        "keywords": ["constitution", "รัฐธรรมนูญ", "10 dezember", "10 december"],
+        "keywords": ["constitution", "รัฐธรรมนูญ", "10 dezember", "10. dezember", "10 december"],
         "name": "Verfassungstag (วันรัฐธรรมนูญ • 10. Dezember)",
         "info": "Der Verfassungstag erinnert an den Übergang Thailands von der absoluten zur konstitutionellen Monarchie im Jahr 1932 durch König Rama VII. (Prajadhipok). Der Tag würdigt das Zustandekommen der ersten dauerhaften Verfassung des Landes. Viele Thais nutzen diesen Feiertag für Familienausflüge sowie das Gedenken an die Entwicklung der Demokratie in Thailand."
     },
     {
-        "keywords": ["new year", "neujahr", "ปีใหม่", "silvester", "สิ้นปี"],
+        "keywords": ["new year", "neujahr", "ปีใหม่", "silvester", "สิ้นปี", "1. januar"],
         "name": "Neujahrstag (วันขึ้นปีใหม่ • 1. Januar)",
         "info": "Neben Songkran im April wird auch der internationale Jahreswechsel in Thailand als Feiertag begangen. Thais beginnen den 1. Januar meist frühmorgens im Tempel mit Gaben an Mönche, um das Jahr mit gutem Karma und Segen zu starten. Anschließend besuchen Familien gemeinsam heilige Schreine und verbringen Zeit im Kreis der Verwandten."
     }
 ]
+
 
 def suche_feiertags_info(summary, ics_desc=""):
     """Sucht nach passender Beschreibung im Feiertags-Lexikon oder nutzt Kalendernotizen."""
@@ -155,8 +158,7 @@ def suche_feiertags_info(summary, ics_desc=""):
                     "titel": eintrag["name"],
                     "text": eintrag["info"]
                 }
-    
-    # Fallback auf vorhandene Beschreibung im Kalender-Event (falls aussagekräftig)
+
     if ics_desc and len(ics_desc.strip()) > 20:
         return {
             "titel": "Kalender-Notiz / Information",
@@ -164,9 +166,11 @@ def suche_feiertags_info(summary, ics_desc=""):
         }
     return None
 
+
 def arabisch_zu_thai_ziffern(zahl):
     """Wandelt arabische Ziffern (0-9) in traditionelle Thai-Ziffern um."""
     return ''.join(thai_ziffern_map.get(ch, ch) for ch in str(zahl))
+
 
 def zahl_zu_thai(n):
     """Wandelt Zahlen von 0 bis 59 in grammatikalisch korrekte Thai-Wörter um."""
@@ -176,16 +180,17 @@ def zahl_zu_thai(n):
         return thai_zahlen[n]
     if n < 20:
         return "สิบเอ็ด" if n == 11 else "สิบ" + thai_zahlen[n - 10]
-    
+
     zehner = n // 10
     einer = n % 10
     zehner_text = "ยี่สิบ" if zehner == 2 else thai_zahlen[zehner] + "สิบ"
-    
+
     if einer == 0:
         return zehner_text
     elif einer == 1:
         return zehner_text + "เอ็ด"
     return zehner_text + thai_zahlen[einer]
+
 
 def zahl_zu_latin(n):
     """Wandelt Zahlen von 0 bis 59 in Lautschrift-Wörter um."""
@@ -199,12 +204,13 @@ def zahl_zu_latin(n):
     zehner = n // 10
     einer = n % 10
     zehner_text = "yi sip" if zehner == 2 else latin_zahlen[zehner] + " sip"
-    
+
     if einer == 0:
         return zehner_text
     elif einer == 1:
         return zehner_text + " et"
     return f"{zehner_text} {latin_zahlen[einer]}"
+
 
 def hour_thai(stunde):
     """Formatiert die Stunde gemäß dem traditionellen thailändischen 6-Stunden-Zeitsystem."""
@@ -229,6 +235,7 @@ def hour_thai(stunde):
         thum = stunde - 18
         return "หนึ่งทุ่ม" if thum == 1 else f"{thai_zahlen[thum]} ทุ่ม"
 
+
 def hour_latin(stunde):
     """Gibt die Stunde im thailändischen System als Lautschrift wieder."""
     if stunde == 0:
@@ -252,6 +259,7 @@ def hour_latin(stunde):
         thum = stunde - 18
         return "neung thum" if thum == 1 else f"{latin_zahlen[thum]} thum"
 
+
 def aktuelles_datum_zeit():
     """Liest die aktuelle Systemzeit aus und erzeugt Thai-, Lautschrift- und DE-Daten."""
     jetzt = datetime.datetime.now()
@@ -273,7 +281,7 @@ def aktuelles_datum_zeit():
         "time": f"{stunde_thai} {min_thai_text} นาที {sek_thai} วินาที"
     }
 
-    # Phonetik / Lautschrift (Vollständige Aussprache auch für Sekunden)
+    # Phonetik / Lautschrift
     thai_latin = {
         "weekday": wochentag_latin,
         "date": f"{jetzt.day}. {monat_latin} {buddhist_jahr} (B.E.)",
@@ -289,6 +297,7 @@ def aktuelles_datum_zeit():
 
     return thai_daten, thai_latin, de_daten
 
+
 def to_local_naive_datetime(dt):
     """Wandelt Zeitzonen-fähige datetimes und Ganztags-Dates sicher in lokale naive datetime um."""
     if isinstance(dt, datetime.datetime):
@@ -298,6 +307,15 @@ def to_local_naive_datetime(dt):
     elif isinstance(dt, datetime.date):
         return datetime.datetime.combine(dt, datetime.time.min)
     return datetime.datetime.now()
+
+
+def ersetze_jahr_sicher(dt, ziel_jahr):
+    """Setzt ein Datum oder Datetime sicher auf ein neues Jahr (inkl. 29. Februar Fallback)."""
+    try:
+        return dt.replace(year=ziel_jahr)
+    except ValueError:
+        return dt.replace(year=ziel_jahr, month=2, day=28)
+
 
 def lade_mehrere_kalender_dateien(pfade):
     """Lädt mehrere .ics-Dateien ein und ignoriert nicht vorhandene Pfade tolerant."""
@@ -315,13 +333,14 @@ def lade_mehrere_kalender_dateien(pfade):
                 kalenders.append(cal)
         except Exception as e:
             print(f"Hinweis: Kalenderdatei '{aufgeloester_pfad}' konnte nicht gelesen werden: {e}")
-            
+
     return kalenders
+
 
 def termine_naechste(kalenders, anzahl=1):
     """
-    Ermittelt das nächste bevorstehende Event und verhindert, dass ganztägige
-    Feiertage am eigentlichen Feiertag vorzeitig ausgeblendet werden.
+    Ermittelt das nächste bevorstehende Event (inkl. Unterstützung für ganztägige
+    Feiertage am heutigen Tag sowie jährlich wiederkehrende RRULE-Einträge).
     """
     jetzt = datetime.datetime.now()
     heute_datum = jetzt.date()
@@ -334,28 +353,47 @@ def termine_naechste(kalenders, anzahl=1):
                     dtstart = komponent.get('dtstart')
                     if not dtstart:
                         continue
-                    
+
                     val = dtstart.dt
                     is_ganztaegig = isinstance(val, datetime.date) and not isinstance(val, datetime.datetime)
                     start_dt = to_local_naive_datetime(val)
 
+                    # Optionales Enddatum prüfen (damit laufende Termine nicht vorzeitig verschwinden)
+                    dtend = komponent.get('dtend')
+                    end_dt = to_local_naive_datetime(dtend.dt) if dtend else start_dt
+
+                    # Prüfen auf jährliche Wiederholungsregel (RRULE:FREQ=YEARLY)
+                    rrule = komponent.get('rrule')
+                    ist_jaehrlich = False
+                    if rrule and 'FREQ' in rrule:
+                        freqs = [str(f).upper() for f in rrule['FREQ']]
+                        if 'YEARLY' in freqs:
+                            ist_jaehrlich = True
+
+                    if ist_jaehrlich:
+                        dauer = end_dt - start_dt
+                        start_dt = ersetze_jahr_sicher(start_dt, jetzt.year)
+                        if (is_ganztaegig and start_dt.date() < heute_datum) or (not is_ganztaegig and start_dt + dauer < jetzt):
+                            start_dt = ersetze_jahr_sicher(start_dt, jetzt.year + 1)
+                        end_dt = start_dt + dauer
+
                     summary = str(komponent.get('summary', 'Ohne Titel'))
                     description = str(komponent.get('description', '')).strip()
 
-                    # Ganztägige Termine bleiben den gesamten Tag über aktiv!
                     if is_ganztaegig:
-                        if val >= heute_datum:
+                        if start_dt.date() >= heute_datum:
                             bevorstehende.append((start_dt, summary, description, is_ganztaegig))
-                    elif start_dt >= jetzt:
+                    elif end_dt >= jetzt:
                         bevorstehende.append((start_dt, summary, description, is_ganztaegig))
         except Exception as e:
             print(f"Fehler beim Parsen von Kalenderkomponente: {e}")
 
-    # Chronologisch sortieren (Ereignisse von heute stehen ganz vorn)
     bevorstehende.sort(key=lambda x: x[0])
     naechste = bevorstehende[:anzahl]
 
     if not naechste:
+        if not ICAL_VERFUEGBAR:
+            return [{"hinweis": "Das Python-Modul 'icalendar' ist nicht installiert.\nBitte führe 'pip install icalendar' im Terminal aus."}]
         if not kalenders:
             return [{"hinweis": "Keine aktiven .ics-Kalenderdateien gefunden.\n(Lege 'kalender.ics' im Skriptordner ab oder passe 'kalender_pfade' an)"}]
         return [{"hinweis": "Keine anstehenden Termine in nächster Zeit."}]
@@ -364,11 +402,10 @@ def termine_naechste(kalenders, anzahl=1):
     for dt, summe, beschreibung, ganztaegig in naechste:
         w_thai, w_latin, w_de = wochentage[dt.weekday()]
         m_thai, m_latin, m_de = monate[dt.month]
-        
+
         t_thai = arabisch_zu_thai_ziffern(dt.day)
         j_thai = arabisch_zu_thai_ziffern(dt.year + 543)
 
-        # Prüfen, ob der Termin genau am heutigen Tag stattfindet
         ist_heute = (dt.date() == heute_datum)
 
         if ganztaegig:
@@ -379,13 +416,13 @@ def termine_naechste(kalenders, anzahl=1):
         else:
             zeit_thai = f"{hour_thai(dt.hour)} {zahl_zu_thai(dt.minute)} นาที"
             zeit_lat = f"{hour_latin(dt.hour)} {zahl_zu_latin(dt.minute)} nathi"
-            status_tag = " [HEUTE]" if ist_heute else ""
+            status_tag = " [วันนี้ • HEUTE]" if ist_heute else ""
             zeile1 = f"✦{status_tag} {w_thai} {t_thai} {m_thai} {j_thai} • {zeit_thai} : {summe}"
             zeile2 = f"   ({w_latin}, {dt.day}. {m_latin} • {zeit_lat})"
             zeile3 = f"   [{w_de}, {dt.strftime('%d.%m.%Y um %H:%M')} Uhr]"
-        
+
         info = suche_feiertags_info(summe, beschreibung)
-        
+
         ergebnis.append({
             "thai": zeile1,
             "latin": zeile2,
@@ -395,15 +432,15 @@ def termine_naechste(kalenders, anzahl=1):
 
     return ergebnis
 
+
 class ThaiZeitApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Thai Zeit & Kalender • เวลาไทย")
+        self.root.title(f"Thai Zeit & Kalender v{__version__} • เวลาไทย")
         self.root.geometry("920x720")
         self.root.minsize(760, 560)
         self.root.configure(bg="#0f172a")
 
-        # Portabler Suchpfad: Prüft zuerst den aktuellen Projektordner, dann Nutzerpfade
         skript_ordner = os.path.dirname(os.path.abspath(__file__))
         self.kalender_pfade = [
             os.path.join(skript_ordner, "kalender.ics"),
@@ -422,7 +459,6 @@ class ThaiZeitApp:
         main_frame = tk.Frame(self.root, bg="#0f172a", padx=25, pady=20)
         main_frame.pack(fill="both", expand=True)
 
-        # Header Card: Uhrzeit & Datum
         card_time = tk.Frame(main_frame, bg="#1e293b", relief="flat", highlightthickness=1, highlightbackground="#334155")
         card_time.pack(fill="x", pady=(0, 15), ipady=12)
 
@@ -444,7 +480,6 @@ class ThaiZeitApp:
         self.lbl_german = tk.Label(sub_info_frame, text="", font=("Segoe UI", 11, "italic"), fg="#64748b", bg="#1e293b")
         self.lbl_german.pack(pady=(2, 0))
 
-        # Kalender Card: Nächstes Ereignis mit Kultur-Bedeutung
         card_cal = tk.Frame(main_frame, bg="#1e293b", relief="flat", highlightthickness=1, highlightbackground="#334155")
         card_cal.pack(fill="both", expand=True, ipady=10)
 
@@ -459,7 +494,6 @@ class ThaiZeitApp:
             bg="#1e293b"
         ).pack(side="left")
 
-        # Text-Widget für formatierte Ausgabe
         self.txt_termine = tk.Text(
             card_cal,
             bg="#1e293b",
@@ -502,7 +536,7 @@ class ThaiZeitApp:
         try:
             self.alle_kalender = lade_mehrere_kalender_dateien(self.kalender_pfade)
             termine = termine_naechste(self.alle_kalender, anzahl=1)
-            
+
             self.txt_termine.config(state="normal")
             self.txt_termine.delete("1.0", tk.END)
 
@@ -527,6 +561,7 @@ class ThaiZeitApp:
             self.txt_termine.config(state="disabled")
 
         self.root.after(60000, self._aktualisiere_termine)
+
 
 if __name__ == "__main__":
     app_root = tk.Tk()
