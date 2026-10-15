@@ -2,99 +2,174 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>ThaiZeit • เวลาไทย</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ThaiZeit v0.5.1 • เวลาไทย</title>
 
-  <!-- PWA & Mobile App Einstellungen -->
+  <!-- PWA & Smartphone Homescreen Einstellungen -->
   <meta name="theme-color" content="#0f172a">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="https://fav.farm/🕒">
-  <link rel="icon" href="https://fav.farm/🕒">
+  <meta name="apple-mobile-web-app-title" content="ThaiZeit">
+  <link rel="apple-touch-icon" href="https://placehold.co/192x192/0f172a/38bdf8?text=เวลา">
+  <link rel="icon" href="https://placehold.co/64x64/0f172a/38bdf8?text=เวลา">
 
-  <!-- Tailwind CSS per CDN für gestochen scharfes, modernes Styling -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Google Fonts: Inter & Noto Sans Thai für optimale Lesbarkeit auf allen Geräten -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* Sanfte Typografie & Berührungsschutz */
     body {
+      font-family: 'Inter', 'Noto Sans Thai', system-ui, -apple-system, sans-serif;
       touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    .thai-font {
+      font-family: 'Noto Sans Thai', 'Inter', sans-serif;
+    }
+    /* Dezent gestaltete Scrollbar für längere Beschreibungen */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
     }
   </style>
 </head>
-<body class="bg-[#0f172a] text-slate-100 min-h-screen flex flex-col items-center justify-between p-4 sm:p-6 antialiased">
 
-  <!-- Haupt-Container (Zentriert und mobil-optimiert) -->
-  <main class="w-full max-w-xl mx-auto flex flex-col gap-5 flex-grow justify-center my-auto">
+<body class="min-h-screen flex flex-col justify-between p-3 sm:p-6 antialiased selection:bg-sky-500 selection:text-white">
 
-    <!-- KARTE 1: UHRZEIT & DATUM -->
-    <section class="bg-[#1e293b] border border-slate-700/80 rounded-2xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center backdrop-blur-md">
-      
-      <!-- Wochentag (Thai) -->
-      <h1 id="thai-weekday" class="text-3xl sm:text-4xl font-extrabold text-sky-400 tracking-wide mb-1">
+  <!-- Obere Status- und Aktionsleiste für Smartphone-Funktionen -->
+  <header class="w-full max-w-2xl mx-auto flex items-center justify-between px-1 py-1 mb-2">
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold text-sm thai-font">
+        ไทย
+      </span>
+      <div>
+        <h1 class="text-sm font-bold text-slate-200 leading-none">ThaiZeit</h1>
+        <span class="text-[11px] text-slate-400">v0.5.1 • เวลาไทย</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <!-- Display Wachhalten Button (Tischuhr-Modus) -->
+      <button id="btn-wakelock" type="button" class="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition active:scale-95" title="Verhindert das Abschalten des Smartphone-Displays">
+        <span id="wakelock-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+        <span id="wakelock-text">Tischuhr-Modus</span>
+      </button>
+
+      <!-- Eigene .ics Kalenderdatei laden -->
+      <label for="ics-upload" class="cursor-pointer flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 transition active:scale-95">
+        <span>📂</span>
+        <span class="hidden xs:inline">.ics laden</span>
+      </label>
+      <input id="ics-upload" type="file" accept=".ics,text/calendar" class="hidden">
+    </div>
+  </header>
+
+  <!-- Hauptbereich: Zweispalten-Layout im Querformat auf Smartphones/Tablets, gestapelt im Hochformat -->
+  <main class="w-full max-w-2xl mx-auto flex flex-col gap-4 my-auto">
+
+    <!-- Status-Hinweisbanner (erscheint bei Datei-Import oder Hinweisen) -->
+    <div id="status-toast" class="hidden rounded-xl bg-emerald-950/90 border border-emerald-500/40 px-4 py-2.5 text-xs sm:text-sm text-emerald-200 flex items-center justify-between shadow-lg">
+      <span id="status-toast-text">Kalender erfolgreich geladen.</span>
+      <button id="btn-close-toast" class="text-emerald-400 hover:text-white font-bold ml-3 px-1">✕</button>
+    </div>
+
+    <!-- KARTE 1: AKTUELLE THAILÄNDISCHE UHRZEIT & DATUM -->
+    <section class="bg-[#1e293b] border border-slate-700/80 rounded-2xl p-5 sm:p-7 shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+      <!-- Dekorativer Lichtakzent im Hintergrund -->
+      <div class=" -top-16 -right-16 w-36 h-36 bg-sky-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+      <!-- Thailändischer Wochentag -->
+      <div id="lbl-thai-weekday" class="thai-font text-3xl sm:text-4xl font-bold text-[#38bdf8] tracking-wide mb-1.5">
+        กำลังโหลด...
+      </div>
+
+      <!-- Thailändisches Datum mit Thai-Ziffern und B.E. (พ.ศ.) -->
+      <div id="lbl-thai-date" class="thai-font text-lg sm:text-2xl text-[#e2e8f0] font-medium mb-2.5">
         --
-      </h1>
+      </div>
 
-      <!-- Datum (Thai mit thailändischen Ziffern und B.E.) -->
-      <h2 id="thai-date" class="text-xl sm:text-2xl text-slate-200 font-medium mb-3">
-        --
-      </h2>
-
-      <!-- Uhrzeit im 6-Stunden-System (Thai) -->
-      <div id="thai-time" class="text-2xl sm:text-3xl font-bold text-emerald-400 tracking-normal mb-5">
+      <!-- Thailändische Uhrzeit im 6-Stunden-System -->
+      <div id="lbl-thai-time" class="thai-font text-xl sm:text-3xl font-bold text-[#4ade80] leading-snug mb-4 px-2">
         --
       </div>
 
       <!-- Trennlinie -->
-      <div class="w-full h-px bg-slate-700/70 mb-4"></div>
+      <div class="w-full h-px bg-slate-700/70 mb-3.5"></div>
 
-      <!-- Phonetische Umschrift (Lautschrift zum Ausspracheüben) -->
-      <p id="latin-info" class="text-sm sm:text-base text-slate-400 leading-relaxed font-normal">
+      <!-- Phonetische Lautschrift (Lateinisch) -->
+      <div id="lbl-latin" class="text-xs sm:text-base text-[#94a3b8] leading-relaxed font-normal px-1">
         --
-      </p>
+      </div>
 
-      <!-- Deutsche Referenz -->
-      <p id="german-info" class="text-xs sm:text-sm text-slate-500 italic mt-1 font-mono">
-        --
-      </p>
+      <!-- Deutsche Referenzzeile -->
+      <div id="lbl-german" class="text-xs sm:text-sm text-[#64748b] italic mt-1.5 font-mono">
+        [--]
+      </div>
     </section>
 
-
-    <!-- KARTE 2: NÄCHSTES EREIGNIS & KULTURLEXIKON -->
-    <section class="bg-[#1e293b] border border-slate-700/80 rounded-2xl p-6 shadow-2xl flex flex-col text-left">
+    <!-- KARTE 2: NÄCHSTES EREIGNIS & FEIERTAGSBEDEUTUNG -->
+    <section class="bg-[#1e293b] border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-2xl flex flex-col text-left">
       
-      <!-- Titel mit Kalender-Symbol -->
-      <div class="flex items-center gap-2 text-slate-300 font-semibold text-base sm:text-lg border-b border-slate-700/70 pb-3 mb-4">
-        <span>📅</span>
-        <span>Nächstes Ereignis • วันสำคัญที่จะมาถึง</span>
-      </div>
-
-      <!-- Termin Kopfzeile (Thai) -->
-      <div id="event-thai" class="text-base sm:text-lg font-bold text-sky-400 leading-snug mb-1">
-        ✦ Lädt nächste Termine...
-      </div>
-
-      <!-- Termin Lautschrift -->
-      <div id="event-latin" class="text-xs sm:text-sm text-slate-400 mb-0.5">
-        --
-      </div>
-
-      <!-- Termin Deutsch -->
-      <div id="event-german" class="text-xs sm:text-sm text-slate-500 italic mb-4">
-        --
-      </div>
-
-      <!-- Infobox mit Feiertagsbedeutung -->
-      <div id="event-infobox" class="bg-slate-900/60 border border-amber-500/30 rounded-xl p-4 mt-1 hidden">
-        <div id="info-title" class="text-amber-400 font-bold text-xs sm:text-sm flex items-center gap-1.5 mb-1.5">
-          <span>💡</span>
-          <span>Bedeutung & Tradition für Thais:</span>
+      <!-- Kopfzeile mit Blätter-Funktion durch die anstehenden Feiertage -->
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700/70 pb-3 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-base sm:text-lg">📅</span>
+          <h2 class="text-sm sm:text-base font-bold text-[#f8fafc] thai-font">
+            Nächstes Ereignis • วันสำคัญที่จะมาถึง
+          </h2>
         </div>
-        <p id="info-text" class="text-xs sm:text-sm text-slate-300 leading-relaxed font-light">
+
+        <!-- Vor/Zurück-Navigation zum Durchstöbern kommender Termine -->
+        <div class="flex items-center gap-1.5">
+          <button id="btn-prev-event" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-medium transition active:scale-95" title="Vorheriger Termin">
+            ◀
+          </button>
+          <span id="event-counter" class="text-[11px] text-slate-400 font-mono min-w-[3rem] text-center">
+            1 / 1
+          </span>
+          <button id="btn-next-event" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-medium transition active:scale-95" title="Nächster Termin">
+            ▶
+          </button>
+          <button id="btn-reset- custom" type="button" class="hidden ml-1 px-2 py-1 rounded-lg bg-rose-950/60 hover:bg-rose-900/70 text-rose-300 border border-rose-700/40 text-[11px] transition" title="Gespeicherte .ics-Datei zurücksetzen">
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Termin-Anzeigebereich (entspricht den Text-Tags aus thaizeit.py) -->
+      <div class="space-y-1 mb-4">
+        <div id="event-thai" class="thai-font text-base sm:text-lg font-bold text-[#38bdf8] leading-snug">
+          --
+        </div>
+        <div id="event-latin" class="text-xs sm:text-sm text-[#94a3b8]">
+          --
+        </div>
+        <div id="event-german" class="text-xs sm:text-sm text-[#64748b] italic">
+          --
+        </div>
+      </div>
+
+      <!-- Goldakzentuierte Infobox für Bedeutung & Tradition -->
+      <div id="event-info-box" class="rounded-xl bg-slate-900/75 border border-amber-500/30 p-4">
+        <div id="event-info-header" class="text-xs sm:text-sm font-bold text-[#f59e0b] mb-1.5 flex items-start gap-1.5">
+          <span>💡</span>
+          <span id="event-info-title">Bedeutung & Tradition für Thais:</span>
+        </div>
+        <p id="event-info-body" class="text-xs sm:text-sm text-[#cbd5e1] leading-relaxed">
           --
         </p>
       </div>
@@ -103,22 +178,24 @@
 
   </main>
 
-  <!-- Fußzeile -->
-  <footer class="text-center text-xs text-slate-600 py-3">
-    ThaiZeit PWA v0.5.0 • Zeitrechnung im buddhistischen Kalender พ.ศ.
+  <!-- Fußzeile mit Hinweis zur Smartphone-Installation -->
+  <footer class="w-full max-w-2xl mx-auto text-center pt-3 pb-1 text-[11px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-1 px-2">
+    <span>Buddhistische Zeitrechnung (พ.ศ. = Jahr + 543)</span>
+    <span>Tipp: Im Handy-Browser „Zum Startbildschirm hinzufügen“ wählen</span>
   </footer>
 
-  <!-- ================= LOGIK (JavaScript) ================= -->
+  <!-- ================= JAVASCRIPT LOGIK (1:1 Portierung von thaizeit.py v0.5.1) ================= -->
   <script>
-    // Wörterbücher für thailändische Zeitrechnung
-    const wochentage = {
-      0: ["วันอาทิตย์", "Wan Athit", "Sonntag"],
+    // --- Wörterbücher für thailändische Zeit & Sprache ---
+    // Hinweis: In JS gibt Date.getDay() 0 für Sonntag bis 6 für Samstag zurück.
+    const wochentageJS = {
       1: ["วันจันทร์", "Wan Chan", "Montag"],
       2: ["วันอังคาร", "Wan Angkhan", "Dienstag"],
       3: ["วันพุธ", "Wan Phut", "Mittwoch"],
       4: ["วันพฤหัสบดี", "Wan Pharuehat", "Donnerstag"],
       5: ["วันศุกร์", "Wan Suk", "Freitag"],
-      6: ["วันเสาร์", "Wan Sao", "Samstag"]
+      6: ["วันเสาร์", "Wan Sao", "Samstag"],
+      0: ["วันอาทิตย์", "Wan Athit", "Sonntag"]
     };
 
     const monate = {
@@ -136,9 +213,177 @@
       12: ["ธันวาคม", "Thanwakhom", "Dezember"]
     };
 
-    const thaiZiffernMap = {'0':'๐','1':'๑','2':'๒','3':'๓','4':'๔','5':'๕','6':'๖','7':'๗','8':'๘','9':'๙'};
-    const thaiZahlen = {0:"ศูนย์", 1:"หนึ่ง", 2:"สอง", 3:"สาม", 4:"สี่", 5:"ห้า", 6:"หก", 7:"เจ็ด", 8:"แปด", 9:"เก้า", 10:"สิบ", 11:"สิบเอ็ด", 12:"สิบสอง"};
-    const latinZahlen = {0:"suun", 1:"neung", 2:"song", 3:"sam", 4:"si", 5:"ha", 6:"hok", 7:"jet", 8:"paet", 9:"kao", 10:"sip", 11:"sip et", 12:"sip song"};
+    const thaiZiffernMap = {
+      '0': '๐', '1': '๑', '2': '๒', '3': '๓', '4': '๔',
+      '5': '๕', '6': '๖', '7': '๗', '8': '๘', '9': '๙'
+    };
+
+    const thaiZahlen = {
+      0: "ศูนย์", 1: "หนึ่ง", 2: "สอง", 3: "สาม", 4: "สี่", 5: "ห้า",
+      6: "หก", 7: "เจ็ด", 8: "แปด", 9: "เก้า", 10: "สิบ",
+      11: "สิบเอ็ด", 12: "สิบสอง"
+    };
+
+    const latinZahlen = {
+      0: "suun", 1: "neung", 2: "song", 3: "sam", 4: "si", 5: "ha",
+      6: "hok", 7: "jet", 8: "paet", 9: "kao", 10: "sip",
+      11: "sip et", 12: "sip song"
+    };
+
+    // Vollständiges Kultur-Lexikon thailändischer Feiertage (identisch zu thaizeit.py)
+    const FEIERTAGE_BEDEUTUNG = [
+      {
+        keywords: ["นวมินทร", "nawamin", "navamin", "king bhumibol memorial", "passing of king rama 9", "13 october", "13 oktober", "13. oktober"],
+        name: "Wan Nawamintharamaharat (วันนวมินทรมหาราช • 13. Oktober)",
+        info: "Dieser Gedenktag erinnert an den Todestag von König Bhumibol Adulyadej (Rama IX.), der Thailand über 70 Jahre lang mit außerordentlicher Hingabe regierte. Im Jahr 2023 verlieh das thailändische Königshaus diesem Feiertag offiziell den Ehrennamen 'Wan Nawamintharamaharat' zum ewigen Andenken an seine Verdienste. Thais tragen an diesem Tag häufig Gelb, halten landesweit Gedenkminuten ab und besuchen Tempel für Verdienstzeremonien (Tham Bun) zu Ehren des unvergessenen Monarchen."
+      },
+      {
+        keywords: ["songkran", "สงกรานต์", "thai new year", "wasserfest"],
+        name: "Songkran (วันสงกรานต์ • Traditionelles Neujahr)",
+        info: "Songkran ist das bedeutendste Familienfest in Thailand und markiert den traditionellen Jahreswechsel. Thais reisen zu ihren Familien, um den Älteren mit duftendem Wasser Respekt zu erweisen und Buddha-Statuen rituell zu reinigen. Die weltbekannten Wasserschlachten auf den Straßen symbolisieren spirituelle Reinigung und das fröhliche Fortspülen von Unglück und Sorgen des alten Jahres."
+      },
+      {
+        keywords: ["loi krathong", "loy krathong", "ลอยกระทง", "lichterfest"],
+        name: "Loy Krathong (วันลอยกระทง • Lichterfest)",
+        info: "In der Vollmondnacht des 12. Mondmonats lassen Thais kunstvoll geschmückte Flößchen (Krathongs) aus Bananenstauden auf Flüssen und Seen schwimmen. Der Brauch ehrt die Wassergöttin Mae Khongkha und bittet um Verzeihung für die Verschmutzung des Wassers. Zugleich symbolisiert das Davonschwimmen der brennenden Kerzen das Loslassen von Groll, Sorgen und schlechtem Karma."
+      },
+      {
+        keywords: ["makha bucha", "มาฆบูชา", "magha puja"],
+        name: "Makha Bucha (วันมาฆบูชา)",
+        info: "Dieser hohe buddhistische Feiertag erinnert an die spontane Versammlung von 1.250 erleuchteten Mönchen um den Buddha, ohne vorherige Absprache. Thais besuchen an diesem Tag Tempel, bringen Opfergaben dar (Tham Bun) und hören sich Predigten über die Kernlehren des Buddha an. Am Abend findet die feierliche Wian-Tian-Prozession statt, bei der Gläubige mit Kerzen, Räucherstäbchen und Lotusblumen andächtig das Hauptheiligtum umrunden."
+      },
+      {
+        keywords: ["visakha bucha", "วิสาขบูชา", "vesak", "wesak"],
+        name: "Visakha Bucha (วันวิสาขบูชา • Höchster Feiertag)",
+        info: "Visakha Bucha gilt als der heiligste Tag des Buddhismus, da er an Geburt, Erleuchtung und das vollkommene Verlöschen (Parinirvana) Buddhas am selben Vollmondtag erinnert. Gläubige in ganz Thailand verbringen den Tag mit Meditation, dem Befolgen der buddhistischen Tugendregeln und großzügigen Spenden. Abends versammeln sich Millionen Thais zu stimmungsvollen Lichterprozessionen um die Tempel."
+      },
+      {
+        keywords: ["asahna bucha", "อาสาฬหบูชา", "asalha puja"],
+        name: "Asahna Bucha (วันอาสาฬหบูชา)",
+        info: "Der Feiertag gedenkt der allerersten Lehrrede Buddhas über die 'Vier Edlen Wahrheiten' und der Gründung der ersten Mönchsgemeinschaft (Sangha). Damit vollendete sich das 'Dreifache Juwel' aus Buddha, Dharma und Sangha. Für Thais ist dies ein Tag tiefer Einkehr, an dem viele Gläubige Tempel aufsuchen und sich auf die anschließende Fastenzeit einstimmen."
+      },
+      {
+        keywords: ["khao phansa", "เข้าพรรษา", "buddhist lent", "regenzeit"],
+        name: "Khao Phansa (วันเข้าพรรษา • Buddhistische Fastenzeit)",
+        info: "Khao Phansa leitet die dreimonatige Regenzeitklausur ein, in der sich Mönche traditionell in ihre Klöster zurückziehen und nicht umherreisen dürfen. Gläubige stiften zu diesem Anlass riesige kunstvoll geschnitzte Wachskerzen und neue Gewänder an die Mönche. Viele Thais nutzen diese dreimonatige Periode für eigene asketische Gelübde, wie etwa den vorübergehenden Verzicht auf Alkohol oder Fleisch."
+      },
+      {
+        keywords: ["ok phansa", "ออกพรรษา", "end of lent"],
+        name: "Ok Phansa (วันออกพรรษา • Ende der Fastenzeit)",
+        info: "Mit Ok Phansa endet die dreimonatige Regenzeit-Klosterklausur der Mönche. Im ganzen Land feiern die Menschen diesen Tag mit farbenfrohen Prozessionen und der traditionellen Kathina-Zeremonie, bei der den Klöstern neue Mönchsroben dargebracht werden. In manchen Provinzen finden spektakuläre Drachenbootrennen und illuminierte Bootsparaden statt."
+      },
+      {
+        keywords: ["chakri", "จักรี", "6 april", "6. april"],
+        name: "Chakri-Gedenktag (วันจักรี • 6. April)",
+        info: "An diesem Nationalfeiertag wird der Gründung der herrschenden Chakri-Dynastie und Bangkoks als Hauptstadt im Jahr 1782 durch König Rama I. gedacht. Für Thais verkörpert das Königshaus ein wichtiges Symbol nationaler Einheit und Stabilität. Die Menschen legen Blumen an Monumenten nieder und gedenken der Verdienste aller bisherigen Monarchen für die Unabhängigkeit des Landes."
+      },
+      {
+        keywords: ["coronation", "ฉัตรมงคล", "krönungstag", "4 mai", "4. mai"],
+        name: "Krönungstag (วันฉัตรมงคล • 4. Mai)",
+        info: "An diesem Feiertag gedenkt das Land der offiziellen Krönungszeremonie von König Maha Vajiralongkorn (Rama X.). Regierungsgebäude und Straßen werden landesweit festlich mit königlichen Symbolen, gelben Stoffen und Porträts geschmückt. Thais bekunden an diesem Tag ihren Respekt gegenüber der Monarchie und dem amtierenden Staatsoberhaupt."
+      },
+      {
+        keywords: ["king rama x", "rama 10", "vajiralongkorn", "วชิราลงกรณ", "เฉลิมพระชนมพรรษา ร.10", "28 juli", "28. juli", "28 july"],
+        name: "Geburtstag von König Rama X. (28. Juli)",
+        info: "Der Geburtstag des amtierenden Königs ist ein hoher Nationalfeiertag in Thailand. Das Volk ehrt den Monarchen durch das Tragen von Gelb (der Farbe des Montags, an dem der König geboren wurde) sowie durch religiöse Verdienstzeremonien. Landesweit organisieren Bürger und Behörden gemeinnützige Hilfsaktionen und Freiwilligenarbeit im Dienst der Allgemeinheit."
+      },
+      {
+        keywords: ["queen sirikit", "muttertag", "mother's day", "วันแม่", "12 august", "12. august"],
+        name: "Muttertag & Geburtstag der Königinmutter (12. August)",
+        info: "Zu Ehren von Königinmutter Sirikit wird ihr Geburtstag zugleich als nationaler Muttertag gefeiert. Kinder knien an diesem Tag traditionell vor ihren Müttern nieder und überreichen weiße Jasminblüten als Zeichen bedingungsloser und reiner Dankbarkeit. Im ganzen Land hängen hellblaue Flaggen (ihre Geburtsfarbe), und Tempel werden für familiäre Segnungen besucht."
+      },
+      {
+        keywords: ["chulalongkorn", "ปิยมหาราช", "จุฬาลงกรณ์", "rama 5", "23 oktober", "23. oktober", "23 october"],
+        name: "Chulalongkorn-Tag (วันปิยมหาราช • 23. Oktober)",
+        info: "Dieser Gedenktag ehrt König Rama V. (Chulalongkorn), der als einer der größten Herrscher Thailands gilt. Ihm gelang es durch geschickte Diplomatie und Reformen, die Kolonisierung des Landes abzuwenden sowie die Sklaverei friedlich abzuschaffen. Thais bringen an seinen Standbildern rosafarbene Rosen dar, um ihre Dankbarkeit für die Modernisierung des Landes zu zeigen."
+      },
+      {
+        keywords: ["bhumibol", "rama 9", "vatertag", "father's day", "วันพ่อ", "5 dezember", "5. dezember", "5 december"],
+        name: "Nationalfeiertag & Geburtstag König Bhumibol (5. Dezember)",
+        info: "Der 5. Dezember war der Geburtstag des 2016 verstorbenen, tief verehrten Königs Bhumibol Adulyadej und ist Thailands Nationalfeiertag sowie Vatertag. Kinder ehren ihre Väter mit gelben Canna-Blumen, während das Land die über 4.000 königlichen Entwicklungsprojekte des Monarchen würdigt. Gelbe Kleidung drückt bis heute die tiefe Dankbarkeit und Verbundenheit vieler Thais mit ihm aus."
+      },
+      {
+        keywords: ["constitution", "รัฐธรรมนูญ", "10 dezember", "10. dezember", "10 december"],
+        name: "Verfassungstag (วันรัฐธรรมนูญ • 10. Dezember)",
+        info: "Der Verfassungstag erinnert an den Übergang Thailands von der absoluten zur konstitutionellen Monarchie im Jahr 1932 durch König Rama VII. (Prajadhipok). Der Tag würdigt das Zustandekommen der ersten dauerhaften Verfassung des Landes. Viele Thais nutzen diesen Feiertag für Familienausflüge sowie das Gedenken an die Entwicklung der Demokratie in Thailand."
+      },
+      {
+        keywords: ["new year", "neujahr", "ปีใหม่", "silvester", "สิ้นปี", "1. januar"],
+        name: "Neujahrstag (วันขึ้นปีใหม่ • 1. Januar)",
+        info: "Neben Songkran im April wird auch der internationale Jahreswechsel in Thailand als Feiertag begangen. Thais beginnen den 1. Januar meist frühmorgens im Tempel mit Gaben an Mönche, um das Jahr mit gutem Karma und Segen zu starten. Anschließend besuchen Familien gemeinsam heilige Schreine und verbringen Zeit im Kreis der Verwandten."
+      }
+    ];
+
+    // Mitgelieferter Standard-Kalender (entspricht beispiel_termine.ics + wichtigste Jahresfeiertage)
+    const STANDARD_ICS_DATA = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//ThaiZeit//Kulturkalender//DE
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20260101
+SUMMARY:วันขึ้นปีใหม่ (Neujahrstag • New Year's Day)
+DESCRIPTION:Beginn des neuen Kalenderjahres mit traditionellem Tempelbesuch (Tham Bun).
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20260406
+SUMMARY:วันจักรี (Chakri-Gedenktag)
+DESCRIPTION:Gründungstag der Chakri-Dynastie und Bangkoks durch König Rama I.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20260413
+SUMMARY:วันสงกรานต์ (Songkran • Traditionelles Thailändisches Neujahr)
+DESCRIPTION:Das große thailändische Neujahrs- und Wasserfest im Kreis der Familie.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20260504
+SUMMARY:วันฉัตรมงคล (Krönungstag • Coronation Day)
+DESCRIPTION:Feiertag zu Ehren der Krönung von König Rama X.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20260728
+SUMMARY:วันเฉลิมพระชนมพรรษา ร.10 (Geburtstag von König Rama X.)
+DESCRIPTION:Hoher Nationalfeiertag zu Ehren des Geburtstags des Königs.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20260812
+SUMMARY:วันแม่แห่งชาติ (Muttertag & Geburtstag Königinmutter Sirikit)
+DESCRIPTION:Nationaler Muttertag in Thailand.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20261013
+SUMMARY:วันนวมินทรมหาราช (Wan Nawamintharamaharat)
+DESCRIPTION:Gedenktag an das Ableben von König Bhumibol Adulyadej (Rama IX.).
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20261023
+SUMMARY:วันปิยมหาราช (Chulalongkorn-Tag)
+DESCRIPTION:Gedenktag zu Ehren von König Chulalongkorn (Rama V.).
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20261124
+SUMMARY:วันลอยกระทง (Loy Krathong • Lichterfest)
+DESCRIPTION:Traditionelles thailändisches Lichterfest am Vollmond des 12. Mondmonats.
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20261205
+SUMMARY:วันพ่อแห่งชาติ (Nationalfeiertag & Gedenktag König Bhumibol)
+DESCRIPTION:Geburtstag von König Bhumibol Adulyadej (Rama IX.) und Vatertag in Thailand.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20261210
+SUMMARY:วันรัฐธรรมนูญ (Verfassungstag • Constitution Day)
+DESCRIPTION:Erinnerung an die erste dauerhafte Verfassung Thailands im Jahr 1932.
+RRULE:FREQ=YEARLY
+END:VEVENT
+END:VCALENDAR`;
 
     function arabischZuThaiZiffern(zahl) {
       return String(zahl).split('').map(ch => thaiZiffernMap[ch] || ch).join('');
@@ -148,9 +393,11 @@
       if (n === 0) return "ศูนย์";
       if (n <= 10) return thaiZahlen[n];
       if (n < 20) return n === 11 ? "สิบเอ็ด" : "สิบ" + thaiZahlen[n - 10];
+
       const zehner = Math.floor(n / 10);
       const einer = n % 10;
       const zehnerText = zehner === 2 ? "ยี่สิบ" : thaiZahlen[zehner] + "สิบ";
+
       if (einer === 0) return zehnerText;
       if (einer === 1) return zehnerText + "เอ็ด";
       return zehnerText + thaiZahlen[einer];
@@ -160,12 +407,14 @@
       if (n === 0) return "suun";
       if (n <= 10) return latinZahlen[n];
       if (n < 20) return n === 11 ? "sip et" : "sip " + latinZahlen[n - 10];
+
       const zehner = Math.floor(n / 10);
       const einer = n % 10;
       const zehnerText = zehner === 2 ? "yi sip" : latinZahlen[zehner] + " sip";
+
       if (einer === 0) return zehnerText;
       if (einer === 1) return zehnerText + " et";
-      return zehnerText + " " + latinZahlen[einer];
+      return `${zehnerText} ${latinZahlen[einer]}`;
     }
 
     function hourThai(stunde) {
@@ -200,83 +449,311 @@
       return thum === 1 ? "neung thum" : `${latinZahlen[thum]} thum`;
     }
 
-    // Feiertags-Lexikon
-    const FEIERTAGE = [
-      {
-        keywords: ["นวมินทร", "nawamin", "13 october", "13 oktober", "bhumibol memorial"],
-        name: "Wan Nawamintharamaharat (วันนวมินทรมหาราช • 13. Oktober)",
-        info: "Dieser Gedenktag erinnert an den Todestag von König Bhumibol Adulyadej (Rama IX.), der Thailand über 70 Jahre lang mit außerordentlicher Hingabe regierte. Im Jahr 2023 verlieh das thailändische Königshaus diesem Feiertag offiziell den Ehrennamen 'Wan Nawamintharamaharat' zum ewigen Andenken an seine Verdienste. Thais tragen an diesem Tag häufig Gelb, halten landesweit Gedenkminuten ab und besuchen Tempel für Verdienstzeremonien (Tham Bun) zu Ehren des unvergessenen Monarchen."
-      },
-      {
-        keywords: ["chulalongkorn", "ปิยมหาราช", "จุฬาลงกรณ์", "23 october", "23 oktober"],
-        name: "Chulalongkorn-Tag (วันปิยมหาราช • 23. Oktober)",
-        info: "Dieser Gedenktag ehrt König Rama V. (Chulalongkorn), der als einer der bedeutendsten Herrscher Thailands gilt. Ihm gelang es durch geschickte Diplomatie und Reformen, die Kolonisierung des Landes abzuwenden sowie die Sklaverei friedlich abzuschaffen. Thais bringen an seinen Standbildern rosafarbene Rosen dar, um ihre Dankbarkeit für die Modernisierung des Landes zu zeigen."
-      },
-      {
-        keywords: ["songkran", "สงกรานต์"],
-        name: "Songkran (วันสงกรานต์ • Traditionelles Neujahr)",
-        info: "Songkran ist das bedeutendste Familienfest in Thailand und markiert den traditionellen Jahreswechsel. Thais reisen zu ihren Familien, um den Älteren mit duftendem Wasser Respekt zu erweisen und Buddha-Statuen rituell zu reinigen. Die weltbekannten Wasserschlachten auf den Straßen symbolisieren spirituelle Reinigung und das fröhliche Fortspülen von Unglück und Sorgen des alten Jahres."
-      },
-      {
-        keywords: ["loi krathong", "loy krathong", "ลอยกระทง"],
-        name: "Loy Krathong (วันลอยกระทง • Lichterfest)",
-        info: "In der Vollmondnacht des 12. Mondmonats lassen Thais kunstvoll geschmückte Flößchen (Krathongs) auf Flüssen und Seen schwimmen. Der Brauch ehrt die Wassergöttin Mae Khongkha und bittet um Verzeihung für die Verschmutzung des Wassers. Zugleich symbolisiert das Davonschwimmen der brennenden Kerzen das Loslassen von Groll, Sorgen und schlechtem Karma."
+    function sucheFeiertagsInfo(summary, icsDesc = "") {
+      const suchtext = `${summary} ${icsDesc}`.toLowerCase();
+      for (const eintrag of FEIERTAGE_BEDEUTUNG) {
+        for (const kw of eintrag.keywords) {
+          if (suchtext.includes(kw)) {
+            return {
+              titel: eintrag.name,
+              text: eintrag.info
+            };
+          }
+        }
       }
-    ];
+      if (icsDesc && icsDesc.trim().length > 20) {
+        return {
+          titel: "Kalender-Notiz / Information",
+          text: icsDesc.trim()
+        };
+      }
+      return null;
+    }
 
-    // Sekündliche Aktualisierung
+    function ersetzeJahrSicher(dateObj, zielJahr) {
+      const neu = new Date(dateObj.getTime());
+      const alterMonat = neu.getMonth();
+      neu.setFullYear(zielJahr);
+      // 29. Februar Fallback für Nicht-Schaltjahre
+      if (neu.getMonth() !== alterMonat) {
+        return new Date(zielJahr, 1, 28, dateObj.getHours(), dateObj.getMinutes(), 0);
+      }
+      return neu;
+    }
+
+    function parseICalDate(rawVal) {
+      const clean = rawVal.trim();
+      // Ganztags-Datum YYYYMMDD
+      if (/^\d{8}$/.test(clean)) {
+        const y = parseInt(clean.slice(0, 4), 10);
+        const m = parseInt(clean.slice(4, 6), 10) - 1;
+        const d = parseInt(clean.slice(6, 8), 10);
+        return { dt: new Date(y, m, d, 0, 0, 0), isGanztaegig: true };
+      }
+      // Datum mit Uhrzeit YYYYMMDDTHHMMSS(Z)
+      const match = clean.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z?)$/);
+      if (match) {
+        const [, y, m, d, hh, mm, ss, z] = match;
+        if (z === 'Z') {
+          return {
+            dt: new Date(Date.UTC(+y, +m - 1, +d, +hh, +mm, +ss)),
+            isGanztaegig: false
+          };
+        }
+        return {
+          dt: new Date(+y, +m - 1, +d, +hh, +mm, +ss),
+          isGanztaegig: false
+        };
+      }
+      return null;
+    }
+
+    function parseICS(icsText) {
+      const unfolded = icsText.replace(/\r\n[ \t]/g, '').replace(/\n[ \t]/g, '');
+      const lines = unfolded.split(/\r?\n/);
+      const events = [];
+      let current = null;
+
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (line === "BEGIN:VEVENT") {
+          current = { summary: "Ohne Titel", description: "", isYearly: false };
+        } else if (line === "END:VEVENT" && current) {
+          if (current.startObj) {
+            events.push(current);
+          }
+          current = null;
+        } else if (current) {
+          const colonIdx = line.indexOf(':');
+          if (colonIdx === -1) continue;
+          const propPart = line.slice(0, colonIdx).toUpperCase();
+          const valPart = line.slice(colonIdx + 1);
+
+          if (propPart.startsWith("DTSTART")) {
+            current.startObj = parseICalDate(valPart);
+          } else if (propPart.startsWith("DTEND")) {
+            current.endObj = parseICalDate(valPart);
+          } else if (propPart.startsWith("SUMMARY")) {
+            current.summary = valPart.replace(/\\,/g, ',').replace(/\\n/g, ' ');
+          } else if (propPart.startsWith("DESCRIPTION")) {
+            current.description = valPart.replace(/\\,/g, ',').replace(/\\n/g, '\n');
+          } else if (propPart.startsWith("RRULE")) {
+            if (valPart.toUpperCase().includes("FREQ=YEARLY")) {
+              current.isYearly = true;
+            }
+          }
+        }
+      }
+      return events;
+    }
+
+    let anstehendeEvents = [];
+    let aktuellerEventIndex = 0;
+
+    function berechneBevorstehendeTermine(icsText) {
+      const rawEvents = parseICS(icsText);
+      const jetzt = new Date();
+      const heuteStart = new Date(jetzt.getFullYear(), jetzt.getMonth(), jetzt.getDate(), 0, 0, 0);
+      const liste = [];
+
+      for (const ev of rawEvents) {
+        const isGanztaegig = ev.startObj.isGanztaegig;
+        let startDt = new Date(ev.startObj.dt.getTime());
+        let endDt = ev.endObj ? new Date(ev.endObj.dt.getTime()) : new Date(startDt.getTime());
+        const dauerMs = Math.max(0, endDt.getTime() - startDt.getTime());
+
+        if (ev.isYearly) {
+          startDt = ersetzeJahrSicher(startDt, jetzt.getFullYear());
+          endDt = new Date(startDt.getTime() + dauerMs);
+          if ((isGanztaegig && startDt < heuteStart) || (!isGanztaegig && endDt < jetzt)) {
+            startDt = ersetzeJahrSicher(startDt, jetzt.getFullYear() + 1);
+            endDt = new Date(startDt.getTime() + dauerMs);
+          }
+        }
+
+        if ((isGanztaegig && startDt >= heuteStart) || (!isGanztaegig && endDt >= jetzt)) {
+          liste.push({
+            dt: startDt,
+            summary: ev.summary,
+            description: ev.description,
+            isGanztaegig
+          });
+        }
+      }
+
+      liste.sort((a, b) => a.dt.getTime() - b.dt.getTime());
+      return liste;
+    }
+
+    function pad2(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function zeigeEventAnIndex(idx) {
+      if (!anstehendeEvents.length) {
+        document.getElementById('event-thai').textContent = "Keine anstehenden Termine in nächster Zeit.";
+        document.getElementById('event-latin').textContent = "";
+        document.getElementById('event-german').textContent = "";
+        document.getElementById('event-info-box').classList.add('hidden');
+        document.getElementById('event-counter').textContent = "0 / 0";
+        return;
+      }
+
+      aktuellerEventIndex = (idx + anstehendeEvents.length) % anstehendeEvents.length;
+      const ev = anstehendeEvents[aktuellerEventIndex];
+      const dt = ev.dt;
+
+      const [wThai, wLatin, wDe] = wochentageJS[dt.getDay()];
+      const [mThai, mLatin] = monate[dt.getMonth() + 1];
+      const tThai = arabischZuThaiZiffern(dt.getDate());
+      const jThai = arabischZuThaiZiffern(dt.getFullYear() + 543);
+
+      const jetzt = new Date();
+      const istHeute = dt.getDate() === jetzt.getDate() &&
+                       dt.getMonth() === jetzt.getMonth() &&
+                       dt.getFullYear() === jetzt.getFullYear();
+      const statusTag = istHeute ? " [วันนี้ • HEUTE]" : "";
+
+      let zeile1 = "";
+      let zeile2 = "";
+      let zeile3 = "";
+
+      if (ev.isGanztaegig) {
+        zeile1 = `✦${statusTag} ${wThai} ${tThai} ${mThai} ${jThai} : ${ev.summary}`;
+        zeile2 = `(${wLatin}, ${dt.getDate()}. ${mLatin} • Ganztägig)`;
+        zeile3 = `[${wDe}, ${pad2(dt.getDate())}.${pad2(dt.getMonth() + 1)}.${dt.getFullYear()} • Ganztägig]`;
+      } else {
+        const zeitThai = `${hourThai(dt.getHours())} ${zahlZuThai(dt.getMinutes())} นาที`;
+        const zeitLat = `${hourLatin(dt.getHours())} ${zahlZuLatin(dt.getMinutes())} nathi`;
+        zeile1 = `✦${statusTag} ${wThai} ${tThai} ${mThai} ${jThai} • ${zeitThai} : ${ev.summary}`;
+        zeile2 = `(${wLatin}, ${dt.getDate()}. ${mLatin} • ${zeitLat})`;
+        zeile3 = `[${wDe}, ${pad2(dt.getDate())}.${pad2(dt.getMonth() + 1)}.${dt.getFullYear()} um ${pad2(dt.getHours())}:${pad2(dt.getMinutes())} Uhr]`;
+      }
+
+      document.getElementById('event-thai').textContent = zeile1;
+      document.getElementById('event-latin').textContent = zeile2;
+      document.getElementById('event-german').textContent = zeile3;
+      document.getElementById('event-counter').textContent = `${aktuellerEventIndex + 1} / ${anstehendeEvents.length}`;
+
+      const info = sucheFeiertagsInfo(ev.summary, ev.description);
+      const infoBox = document.getElementById('event-info-box');
+
+      if (info) {
+        infoBox.classList.remove('hidden');
+        document.getElementById('event-info-title').textContent = `Bedeutung & Tradition für Thais (${info.titel}):`;
+        document.getElementById('event-info-body').textContent = info.text;
+      } else {
+        infoBox.classList.add('hidden');
+      }
+    }
+
     function aktualisiereUhrzeit() {
       const jetzt = new Date();
       const buddhistJahr = jetzt.getFullYear() + 543;
 
-      const [wThai, wLatin, wDe] = wochentage[jetzt.getDay()];
-      const [mThai, mLatin, mDe] = monate[jetzt.getMonth() + 1];
+      const [wThai, wLatin, wDe] = wochentageJS[jetzt.getDay()];
+      const [mThai, mLatin] = monate[jetzt.getMonth() + 1];
 
       const tagThai = arabischZuThaiZiffern(jetzt.getDate());
       const jahrThai = arabischZuThaiZiffern(buddhistJahr);
       const stundeThai = hourThai(jetzt.getHours());
-      const minThai = zahlZuThai(jetzt.getMinutes());
+      const minThaiText = zahlZuThai(jetzt.getMinutes());
       const sekThai = arabischZuThaiZiffern(jetzt.getSeconds());
 
-      // HTML-Elemente aktualisieren
-      document.getElementById('thai-weekday').textContent = wThai;
-      document.getElementById('thai-date').textContent = `วันที่ ${tagThai} ${mThai} พ.ศ. ${jahrThai}`;
-      document.getElementById('thai-time').textContent = `${stundeThai} ${minThai} นาที ${sekThai} วินาที`;
+      document.getElementById('lbl-thai-weekday').textContent = wThai;
+      document.getElementById('lbl-thai-date').textContent = `วันที่ ${tagThai} ${mThai} พ.ศ. ${jahrThai}`;
+      document.getElementById('lbl-thai-time').textContent = `${stundeThai} ${minThaiText} นาที ${sekThai} วินาที`;
 
-      // Lautschrift
-      const stundeLat = hourLatin(jetzt.getHours());
-      const minLat = zahlZuLatin(jetzt.getMinutes());
-      const sekLat = zahlZuLatin(jetzt.getSeconds());
-      document.getElementById('latin-info').textContent = 
-        `${wLatin}, ${jetzt.getDate()}. ${mLatin} ${buddhistJahr} (B.E.) • ${stundeLat} ${minLat} nathi, ${sekLat} wina-thii`;
+      const zeitLatin = `${hourLatin(jetzt.getHours())} ${zahlZuLatin(jetzt.getMinutes())} nathi, ${zahlZuLatin(jetzt.getSeconds())} wina-thii`;
+      document.getElementById('lbl-latin').textContent = `${wLatin}, ${jetzt.getDate()}. ${mLatin} ${buddhistJahr} (B.E.) • ${zeitLatin}`;
 
-      // Deutsch
-      const pad = n => String(n).padStart(2, '0');
-      document.getElementById('german-info').textContent = 
-        `[${wDe}, ${pad(jetzt.getDate())}.${pad(jetzt.getMonth() + 1)}.${jetzt.getFullYear()} • ${pad(jetzt.getHours())}:${pad(jetzt.getMinutes())}:${pad(jetzt.getSeconds())} Uhr]`;
+      const deDatum = `${pad2(jetzt.getDate())}.${pad2(jetzt.getMonth() + 1)}.${jetzt.getFullYear()}`;
+      const deZeit = `${pad2(jetzt.getHours())}:${pad2(jetzt.getMinutes())}:${pad2(jetzt.getSeconds())} Uhr`;
+      document.getElementById('lbl-german').textContent = `[${wDe}, ${deDatum} • ${deZeit}]`;
     }
 
-    // Nächstes Ereignis vorbereiten (z. B. 13. Oktober)
-    function initialisiereEreignis() {
-      const heute = new Date();
-      // Beispielhaft als nächstes Event: 13. Oktober (Wan Nawamintharamaharat)
-      const eventInfo = FEIERTAGE[0];
+    function zeigeToast(nachricht) {
+      const toast = document.getElementById('status-toast');
+      document.getElementById('status-toast-text').textContent = nachricht;
+      toast.classList.remove('hidden');
+    }
 
-      document.getElementById('event-thai').textContent = "✦ วันอังคาร ๑๓ ตุลาคม ๒๕๖๙ : วันนวมินทรมหาราช";
-      document.getElementById('event-latin').textContent = "Wan Angkhan, 13. Tulakhom • Ganztägig";
-      document.getElementById('event-german').textContent = "[Dienstag, 13.10.2026 • Ganztägig]";
-
-      if (eventInfo) {
-        document.getElementById('event-infobox').classList.remove('hidden');
-        document.getElementById('info-title').textContent = `💡 Bedeutung & Tradition für Thais (${eventInfo.name}):`;
-        document.getElementById('info-text').textContent = eventInfo.info;
+    function ladeKalenderDaten() {
+      const gespeichert = localStorage.getItem('thaizeit_custom_ics');
+      const resetBtn = document.getElementById('btn-reset-custom');
+      if (gespeichert) {
+        anstehendeEvents = berechneBevorstehendeTermine(gespeichert + "\n" + STANDARD_ICS_DATA);
+        if (resetBtn) resetBtn.classList.remove('hidden');
+      } else {
+        anstehendeEvents = berechneBevorstehendeTermine(STANDARD_ICS_DATA);
+        if (resetBtn) resetBtn.classList.add('hidden');
       }
+      zeigeEventAnIndex(0);
     }
 
-    // Starten
-    setInterval(aktualisiereUhrzeit, 1000);
+    // Event-Listener für .ics Datei-Upload auf dem Smartphone
+    document.getElementById('ics-upload').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const content = ev.target.result;
+        if (content && content.includes("BEGIN:VCALENDAR")) {
+          localStorage.setItem('thaizeit_custom_ics', content);
+          ladeKalenderDaten();
+          zeigeToast(`Kalender "${file.name}" erfolgreich auf dem Gerät gespeichert!`);
+        } else {
+          zeigeToast("Hinweis: Die gewählte Datei ist keine gültige .ics-Kalenderdatei.");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('btn-close-toast').addEventListener('click', () => {
+      document.getElementById('status-toast').classList.add('hidden');
+    });
+
+    document.getElementById('btn-prev-event').addEventListener('click', () => {
+      zeigeEventAnIndex(aktuellerEventIndex - 1);
+    });
+
+    document.getElementById('btn-next-event').addEventListener('click', () => {
+      zeigeEventAnIndex(aktuellerEventIndex + 1);
+    });
+
+    // Screen Wake Lock (Tischuhr-Modus für Smartphones)
+    let wakeLock = null;
+    document.getElementById('btn-wakelock').addEventListener('click', async () => {
+      const dot = document.getElementById('wakelock-dot');
+      const txt = document.getElementById('wakelock-text');
+      try {
+        if (!wakeLock) {
+          if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+            txt.textContent = "Display aktiv";
+            wakeLock.addEventListener('release', () => {
+              wakeLock = null;
+              dot.className = "w-2 h-2 rounded-full bg-slate-500";
+              txt.textContent = "Tischuhr-Modus";
+            });
+          } else {
+            zeigeToast("Hinweis: Dein Browser unterstützt das automatische Wachhalten nicht.");
+          }
+        } else {
+          await wakeLock.release();
+          wakeLock = null;
+        }
+      } catch (err) {
+        zeigeToast("Tischuhr-Modus konnte nicht aktiviert werden.");
+      }
+    });
+
+    // Start der App
     aktualisiereUhrzeit();
-    initialisiereEreignis();
+    ladeKalenderDaten();
+    setInterval(aktualisiereUhrzeit, 1000);
+    setInterval(ladeKalenderDaten, 60000);
   </script>
 </body>
 </html>
