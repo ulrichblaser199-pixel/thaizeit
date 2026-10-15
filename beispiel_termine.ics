@@ -1,35 +1,96 @@
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//ThaiZeit//Kulturkalender//DE
-X-WR-CALNAME:Thailaendische Feiertage (Beispiel)
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
 BEGIN:VEVENT
-SUMMARY:วันนวมินทรมหาราช (Wan Nawamintharamaharat)
-DTSTART;VALUE=DATE:20261013
-DTEND;VALUE=DATE:20261014
-DESCRIPTION:Gedenktag an König Bhumibol Adulyadej (Rama IX.)
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:วันปิยมหาราช (Chulalongkorn-Tag)
 DTSTART;VALUE=DATE:20261023
-DTEND;VALUE=DATE:20261024
-DESCRIPTION:Gedenktag an König Chulalongkorn (Rama V.)
+SUMMARY:วันปิยมหาราช (Chulalongkorn-Tag)
+DESCRIPTION:Gedenktag zu Ehren von König Chulalongkorn (Rama V.), dem großen Reformer Thailands.
+RRULE:FREQ=YEARLY
 END:VEVENT
 BEGIN:VEVENT
-SUMMARY:วันลอยกระทง (Loy Krathong)
+DTSTART;VALUE=DATE:20261026
+SUMMARY:วันออกพรรษา (Ok Phansa • Ende der Fastenzeit)
+DESCRIPTION:Ende der dreimonatigen buddhistischen Regenzeitklausur der Mönche mit Lichterprozessionen.
+END:VEVENT
+BEGIN:VEVENT
 DTSTART;VALUE=DATE:20261124
-DTEND;VALUE=DATE:20261125
-DESCRIPTION:Traditionelles thailändisches Lichterfest
+SUMMARY:วันลอยกระทง (Loy Krathong • Lichterfest)
+DESCRIPTION:Traditionelles thailändisches Lichterfest in der Vollmondnacht des 12. Mondmonats.
 END:VEVENT
 BEGIN:VEVENT
-SUMMARY:วันพ่อแห่งชาติ (Nationalfeiertag & Vatertag)
 DTSTART;VALUE=DATE:20261205
-DTEND;VALUE=DATE:20261206
-DESCRIPTION:Geburtstag von König Bhumibol Adulyadej (Rama IX.)
+SUMMARY:วันพ่อแห่งชาติ (Nationalfeiertag & Geburtstag König Bhumibol)
+DESCRIPTION:Geburtstag von König Bhumibol Adulyadej (Rama IX.) sowie National- und Vatertag in Thailand.
+RRULE:FREQ=YEARLY
 END:VEVENT
 BEGIN:VEVENT
-SUMMARY:วันสงกรานต์ (Songkran)
+DTSTART;VALUE=DATE:20261210
+SUMMARY:วันรัฐธรรมนูญ (Verfassungstag • Constitution Day)
+DESCRIPTION:Erinnerung an die erste dauerhafte Verfassung Thailands im Jahr 1932.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20270101
+SUMMARY:วันขึ้นปีใหม่ (Neujahrstag • New Year's Day)
+DESCRIPTION:Beginn des neuen Kalenderjahres mit traditionellem Tempelbesuch (Tham Bun).
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20270221
+SUMMARY:วันมาฆบูชา (Makha Bucha)
+DESCRIPTION:Hoher buddhistischer Feiertag zum Gedenken an die spontane Versammlung von 1.250 Mönchen bei Buddha.
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20270406
+SUMMARY:วันจักรี (Chakri-Gedenktag)
+DESCRIPTION:Gründungstag der Chakri-Dynastie und Bangkoks im Jahr 1782 durch König Rama I.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
 DTSTART;VALUE=DATE:20270413
-DTEND;VALUE=DATE:20270416
-DESCRIPTION:Traditionelles thailändisches Neujahrsfest
+SUMMARY:วันสงกรานต์ (Songkran • Traditionelles Thailändisches Neujahr)
+DESCRIPTION:Das bedeutendste thailändische Familien- und Wasserfest zum traditionellen Jahreswechsel.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20270504
+SUMMARY:วันฉัตรมงคล (Krönungstag • Coronation Day)
+DESCRIPTION:Nationalfeiertag zu Ehren der Krönungszeremonie von König Maha Vajiralongkorn (Rama X.).
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20270520
+SUMMARY:วันวิสาขบูชา (Visakha Bucha • Höchster buddhistischer Feiertag)
+DESCRIPTION:Gedenktag an Geburt, Erleuchtung und Parinirvana Buddhas mit abendlichen Kerzenprozessionen.
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20270718
+SUMMARY:วันอาสาฬหบูชา (Asahna Bucha)
+DESCRIPTION:Gedenktag der ersten Lehrrede Buddhas und der Gründung der ersten Mönchsgemeinschaft.
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20270719
+SUMMARY:วันเข้าพรรษา (Khao Phansa • Beginn der Fastenzeit)
+DESCRIPTION:Beginn der dreimonatigen Regenzeitklausur der buddhistischen Mönche.
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20270728
+SUMMARY:วันเฉลิมพระชนมพรรษา ร.10 (Geburtstag von König Rama X.)
+DESCRIPTION:Hoher Nationalfeiertag zu Ehren des Geburtstags von König Maha Vajiralongkorn.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20270812
+SUMMARY:วันแม่แห่งชาติ (Muttertag & Geburtstag der Königinmutter Sirikit)
+DESCRIPTION:Nationaler Muttertag in Thailand zu Ehren von Königinmutter Sirikit.
+RRULE:FREQ=YEARLY
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20271013
+SUMMARY:วันนวมินทรมหาราช (Wan Nawamintharamaharat)
+DESCRIPTION:Gedenktag an das Ableben von König Bhumibol Adulyadej (Rama IX.).
+RRULE:FREQ=YEARLY
 END:VEVENT
 END:VCALENDAR
